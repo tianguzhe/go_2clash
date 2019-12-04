@@ -118,6 +118,7 @@ func getSSNode(s string) NodeBean {
 	var nodeBean NodeBean
 
 	nodeBean.Name, _ = url.QueryUnescape(strings.Split(s, "#")[1])
+	nodeBean.Name = strings.ReplaceAll(nodeBean.Name, "#", "")
 	nodeBean.NodeType = "ss"
 	nodeBean.Server = strings.Split(strings.Split(s, "@")[1], ":")[0]
 	nodeBean.Port = strings.Split(strings.Split(s, ":")[1], "#")[0]
