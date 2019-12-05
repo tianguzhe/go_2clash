@@ -13,6 +13,9 @@ import (
 	"strings"
 )
 
+var emojiData = make(chan string)
+var ppp string
+
 //获取订阅链接文本
 func getUrlData(url string) string {
 	resp, err := http.Get(url)
@@ -41,7 +44,8 @@ func base64Encode(url string) string {
 
 		decodeString, err := b64.URLEncoding.DecodeString(decodeInfoByByte(data))
 		if err != nil {
-			panic(err)
+			fmt.Printf("[base64Encode Error] %s \n", err)
+			continue
 		}
 
 		allNode += string(decodeString)
@@ -153,7 +157,8 @@ func setNodes(infos []NodeBean) string {
 
 	proxies := make([]string, 0)
 
-	ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
+	//ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
+	//ppp := <-emojiData
 
 	m := make(map[string][]string)
 
@@ -209,7 +214,9 @@ func setPG(infos []NodeBean) string {
 
 	var allName string
 
-	ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
+	//ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
+
+	//ppp := <-emojiData
 
 	m := make(map[string][]string)
 
@@ -249,6 +256,11 @@ func setPG(infos []NodeBean) string {
 	return "\n\nProxy Group:\n" + Proxy0 + Proxy1 + Proxy2 + Proxy3 + Proxy4 + Rule
 }
 
+func getEmojiData(ch chan string) {
+	ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
+	ch <- ppp
+}
+
 func main() {
 
 	header := getUrlData("https://raw.githubusercontent.com/tianguzhe/ClashRConf/master/General.yml")
@@ -268,7 +280,11 @@ func main() {
 		writer.WriteString(urlAddress + "\n")
 		writer.Flush()
 
+		go getEmojiData(emojiData)
+
 		nodeInfo := getAllNodes(base64Encode(urlAddress))
+
+		ppp = <-emojiData
 
 		proxy := setNodes(nodeInfo)
 		proxyGroup := setPG(nodeInfo)
