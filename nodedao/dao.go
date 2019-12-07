@@ -60,6 +60,7 @@ func CreateMD5Url(url string) error {
 		Urls:       url,
 		CreateTime: create,
 		Sha1Str:    md5Str,
+		Hide:       false,
 	})
 
 	return err
@@ -95,4 +96,21 @@ func CheckUrlSha1(sha1 string) (*NodeOrm, error) {
 	}
 
 	return a, err
+}
+
+func UpdateUrl(s string) (*NodeOrm, error) {
+
+	updateTime := time.Now().Format("2006-01-02 15:04:05")
+
+	orm, err := CheckUrl(s)
+	if err != nil {
+		fmt.Printf("[Error]  Get Engine Error %s", err)
+		return orm, err
+	}
+
+	orm.UpdateTime = updateTime
+
+	_, err = x.ID(orm.Id).Update(orm)
+
+	return orm, err
 }

@@ -23,4 +23,5 @@ type NodeOrm struct {
 	CreateTime string
 	UpdateTime string
 	Sha1Str    string `xrom:"unique"`
+	Hide       bool
 }

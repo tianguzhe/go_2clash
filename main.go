@@ -225,6 +225,12 @@ func main() {
 					return
 				}
 			} else {
+				_, err := UpdateUrl(urlAddress)
+				if err != nil {
+					fmt.Printf("[Error] Insert Data Error %s", err)
+					return
+				}
+
 				urlSha1 = checkUrl.Sha1Str
 			}
 		}
