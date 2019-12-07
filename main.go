@@ -1,12 +1,14 @@
 package main
 
 import (
+	. "awesomeProject/model"
+	. "awesomeProject/nodedao"
+	. "awesomeProject/nodeutils"
 	"bufio"
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,77 +17,6 @@ import (
 
 var emojiData = make(chan string)
 var ppp string
-
-//获取订阅链接文本
-func getUrlData(url string) string {
-	resp, err := http.Get(url)
-	if err != nil {
-		panic(err)
-	}
-
-	defer resp.Body.Close()
-
-	s, err := ioutil.ReadAll(resp.Body)
-	return string(s)
-}
-
-//base64解码
-func base64Encode(url string) string {
-
-	urlSplit := strings.Split(url, "+")
-
-	var allNode string
-
-	//fmt.Printf("%#v \n", urlSplit)
-
-	for _, url := range urlSplit {
-
-		data := getUrlData(url)
-
-		decodeString, err := b64.URLEncoding.DecodeString(decodeInfoByByte(data))
-		if err != nil {
-			fmt.Printf("[base64Encode Error] %s \n", err)
-			continue
-		}
-
-		allNode += string(decodeString)
-	}
-
-	return allNode
-
-}
-
-func decodeInfoByByte(info string) string {
-
-	lens := len(info)
-	if lens%4 == 1 {
-		info = info + "==="
-	} else if lens%4 == 2 {
-		info = info + "=="
-	} else if lens%4 == 3 {
-		info = info + "="
-	}
-
-	return info
-
-}
-
-type NodeBean struct {
-	Server   string `json:"add"`
-	NodeType string `json:"node_type"`
-	Host     string `json:"host"`
-	Uuid     string `json:"id"`
-	Network  string `json:"net"`
-	Path     string `json:"path"`
-	Port     string `json:"port"`
-	Name     string `json:"ps"`
-	Tls      string `json:"tls"`
-	V        int    `json:"v"`
-	AlterId  int    `json:"aid"`
-	Type     string `json:"type"`
-	Cipher   string `json:"cipher"`
-	Password string `json:"password"`
-}
 
 //提取节点信息
 func getAllNodes(nodes string) []NodeBean {
@@ -114,7 +45,7 @@ func getAllNodes(nodes string) []NodeBean {
 
 func getSSNode(s string) NodeBean {
 
-	info, err := b64.URLEncoding.DecodeString(decodeInfoByByte(strings.Split(s, "@")[0]))
+	info, err := b64.URLEncoding.DecodeString(DecodeInfoByByte(strings.Split(s, "@")[0]))
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +66,7 @@ func getSSNode(s string) NodeBean {
 
 func getVmessNode(s string) NodeBean {
 
-	decodeString, err := b64.URLEncoding.DecodeString(decodeInfoByByte(s))
+	decodeString, err := b64.URLEncoding.DecodeString(DecodeInfoByByte(s))
 	if err != nil {
 		panic(err)
 
@@ -251,25 +182,30 @@ func setPG(infos []NodeBean) string {
 	Proxy3 := fmt.Sprintf("- { name: \"Prevent\", type: select, proxies:  [\"REJECT\",\"DIRECT\"] }\n")
 	Proxy4 := fmt.Sprintf("- { name: \"Others\", type: select, proxies:  [\"PROXY\",\"DIRECT\"] }\n")
 
+	sha1Str := "\n" + "#" + urlSha1 + "\n"
+
 	Rule := "\n"
 
-	return "\n\nProxy Group:\n" + Proxy0 + Proxy1 + Proxy2 + Proxy3 + Proxy4 + Rule
+	return "\n\nProxy Group:\n" + Proxy0 + Proxy1 + Proxy2 + Proxy3 + Proxy4 + sha1Str + Rule
 }
 
 func getEmojiData(ch chan string) {
-	ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
+	ppp := GetUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
 	ch <- ppp
 }
 
+var urlSha1 string
+
 func main() {
 
-	header := getUrlData("https://raw.githubusercontent.com/tianguzhe/ClashRConf/master/General.yml")
+	header := GetUrlData("https://raw.githubusercontent.com/tianguzhe/ClashRConf/master/General.yml")
 
-	foot := getUrlData("https://raw.githubusercontent.com/tianguzhe/ClashRConf/master/Rule.yml")
+	foot := GetUrlData("https://raw.githubusercontent.com/tianguzhe/ClashRConf/master/Rule.yml")
 
 	r := gin.Default()
 	r.GET("/2clash", func(c *gin.Context) {
 		urlAddress := c.DefaultQuery("url", "")
+		urlSha1 = c.DefaultQuery("code", "")
 
 		file, err := os.OpenFile("./newUrlList.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 		if err != nil {
@@ -280,9 +216,32 @@ func main() {
 		writer.WriteString(urlAddress + "\n")
 		writer.Flush()
 
+		if urlAddress != "" {
+			checkUrl, err := CheckUrl(urlAddress)
+			if err != nil {
+				err = CreateMD5Url(urlAddress)
+				if err != nil {
+					fmt.Printf("[Error] Insert Data Error %s", err)
+					return
+				}
+			} else {
+				urlSha1 = checkUrl.Sha1Str
+			}
+		}
+
+		if urlSha1 != "" {
+			checkUrl, err := CheckUrlSha1(urlSha1)
+			if err != nil {
+				return
+			}
+
+			urlAddress = checkUrl.Urls
+
+		}
+
 		go getEmojiData(emojiData)
 
-		nodeInfo := getAllNodes(base64Encode(urlAddress))
+		nodeInfo := getAllNodes(Base64Encode(urlAddress))
 
 		ppp = <-emojiData
 
