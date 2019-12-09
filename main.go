@@ -45,7 +45,7 @@ func getAllNodes(nodes string) []NodeBean {
 
 func getSSNode(s string) NodeBean {
 
-	info, err := b64.URLEncoding.DecodeString(DecodeInfoByByte(strings.Split(s, "@")[0]))
+	info, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(strings.Split(s, "@")[0]))
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +66,7 @@ func getSSNode(s string) NodeBean {
 
 func getVmessNode(s string) NodeBean {
 
-	decodeString, err := b64.URLEncoding.DecodeString(DecodeInfoByByte(s))
+	decodeString, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(s))
 	if err != nil {
 		panic(err)
 
