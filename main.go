@@ -69,8 +69,9 @@ func getVmessNode(s string) NodeBean {
 	decodeString, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(s))
 	if err != nil {
 		panic(err)
-
 	}
+
+	fmt.Printf("%s \n", decodeString)
 
 	var nodeBean NodeBean
 
@@ -80,6 +81,7 @@ func getVmessNode(s string) NodeBean {
 	}
 
 	nodeBean.NodeType = "vmess"
+	fmt.Printf("%#v \n", nodeBean)
 
 	return nodeBean
 }
@@ -125,13 +127,13 @@ func setNodes(infos []NodeBean) string {
 
 		if nodeType == "vmess" {
 			if tls != "" {
-				proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %s, uuid: %s, alterId: %d, cipher: auto, network: %s, ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, int(alterId), network, host)
+				proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, network, host)
 			} else {
-				proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %s, uuid: %s, alterId: %d, cipher: auto, network: %s, ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, int(alterId), network, host)
+				proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, host)
 			}
 
 		} else if nodeType == "ss" {
-			proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %s, cipher: %s, password: %s }", name, nodeType, server, port, cipher, password)
+			proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %v, cipher: %s, password: %s }", name, nodeType, server, port, cipher, password)
 		}
 
 		proxies = append(proxies, proxy)
@@ -256,6 +258,6 @@ func main() {
 
 		c.String(http.StatusOK, "%s", header+proxy+proxyGroup+foot)
 	})
-	r.Run(":9001")
+	r.Run(":9002")
 
 }
