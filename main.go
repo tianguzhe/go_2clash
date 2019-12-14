@@ -121,15 +121,16 @@ func setNodes(infos []NodeBean) string {
 		host := node.Host
 		cipher := node.Cipher
 		password := node.Password
+		path := node.Path
 		tls := node.Tls
 
 		var proxy string
 
 		if nodeType == "vmess" {
 			if tls != "" {
-				proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, network, host)
+				proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, network, path, host)
 			} else {
-				proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, host)
+				proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, path, host)
 			}
 
 		} else if nodeType == "ss" {
