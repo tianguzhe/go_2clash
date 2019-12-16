@@ -128,9 +128,18 @@ func setNodes(infos []NodeBean) string {
 
 		if nodeType == "vmess" {
 			if tls != "" {
-				proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, network, path, host)
+				if host == "" {
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\" , tls: true }", name, nodeType, server, port, uuid, alterId, network, path)
+				} else {
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, network, path, host)
+				}
 			} else {
-				proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, path, host)
+				if host == "" {
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\" }", name, nodeType, server, port, uuid, alterId, network, path)
+				} else {
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, path, host)
+
+				}
 			}
 
 		} else if nodeType == "ss" {
