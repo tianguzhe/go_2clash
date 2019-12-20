@@ -37,6 +37,20 @@ func Base64Encode(url string) string {
 	return allNode
 }
 
+//获取clash节点
+func GetClashProxy(url string) string {
+
+	var allNode string
+
+	urlSplit := strings.Split(url, "+")
+	for _, url := range urlSplit {
+		data := GetUrlData(url)
+		s := strings.Split(strings.Split(data, "Proxy:")[1], "Proxy Group:")[0]
+		allNode += s
+	}
+	return allNode
+}
+
 func DecodeInfoByByte(info string) string {
 	lens := len(info)
 	if lens%4 == 1 {

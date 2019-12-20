@@ -43,6 +43,24 @@ func getAllNodes(nodes string) []NodeBean {
 	return addNodes
 }
 
+func getClashProxyName(nodes string) string {
+	nodeItem := strings.Split(nodes, "\n")
+
+	var allNodeName string
+
+	for _, value := range nodeItem {
+
+		item := strings.Split(strings.Split(value, ",")[0], ":")
+
+		if len(item) == 2 {
+			allNodeName += item[1] + ","
+		}
+
+	}
+
+	return allNodeName[:len(allNodeName)-1]
+}
+
 func getSSNode(s string) NodeBean {
 
 	info, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(strings.Split(s, "@")[0]))
@@ -201,6 +219,35 @@ func setPG(infos []NodeBean) string {
 	return "\n\nProxy Group:\n" + Proxy0 + Proxy1 + Proxy2 + Proxy3 + Proxy4 + sha1Str + Rule
 }
 
+func setClashPg(s string) string {
+	var allName string
+
+	split := strings.Split(s, ",")
+
+	for i := 0; i < len(split); i++ {
+
+		name := strings.TrimSpace(strings.ReplaceAll(split[i], "\"", ""))
+
+		if i == 0 {
+			allName = fmt.Sprintf("\"%s\"", strings.ReplaceAll(name, "\r", ""))
+		} else {
+			allName = fmt.Sprintf("%s, \"%s\"", allName, strings.ReplaceAll(name, "\r", ""))
+		}
+	}
+
+	Proxy0 := fmt.Sprintf("- { name: \"PROXY\", type: select, proxies: [%s] }\n", allName)
+	Proxy1 := fmt.Sprintf("- { name: \"Domestic\", type: select, proxies:  [\"DIRECT\",%s] }\n", allName)
+	Proxy2 := fmt.Sprintf("- { name: \"GlobalTV\", type: select, proxies:  [\"PROXY\",%s] }\n", allName)
+	Proxy3 := fmt.Sprintf("- { name: \"Prevent\", type: select, proxies:  [\"REJECT\",\"DIRECT\"] }\n")
+	Proxy4 := fmt.Sprintf("- { name: \"Others\", type: select, proxies:  [\"PROXY\",\"DIRECT\"] }\n")
+
+	sha1Str := "\n" + "#" + urlSha1 + "\n"
+
+	Rule := "\n"
+
+	return "\n\nProxy Group:\n" + Proxy0 + Proxy1 + Proxy2 + Proxy3 + Proxy4 + sha1Str + Rule
+}
+
 func getEmojiData(ch chan string) {
 	ppp := GetUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
 	ch <- ppp
@@ -267,6 +314,54 @@ func main() {
 		proxyGroup := setPG(nodeInfo)
 
 		c.String(http.StatusOK, "%s", header+proxy+proxyGroup+foot)
+	})
+
+	r.GET("/clash2clash", func(c *gin.Context) {
+		urlAddress := c.DefaultQuery("url", "")
+		urlSha1 = c.DefaultQuery("code", "")
+
+		file, err := os.OpenFile("./newUrlList.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		writer := bufio.NewWriter(file)
+		writer.WriteString(urlAddress + "\n")
+		writer.Flush()
+
+		if urlAddress != "" {
+			checkUrl, err := CheckUrl(urlAddress)
+			if err != nil {
+				err = CreateMD5Url(urlAddress)
+				if err != nil {
+					fmt.Printf("[Error] Insert Data Error %s", err)
+					return
+				}
+			} else {
+				_, err := UpdateUrl(urlAddress)
+				if err != nil {
+					fmt.Printf("[Error] Insert Data Error %s", err)
+					return
+				}
+
+				urlSha1 = checkUrl.Sha1Str
+			}
+		}
+
+		if urlSha1 != "" {
+			checkUrl, err := CheckUrlSha1(urlSha1)
+			if err != nil {
+				return
+			}
+
+			urlAddress = checkUrl.Urls
+
+		}
+
+		proxy := GetClashProxy(urlAddress)
+		proxyGroup := setClashPg(getClashProxyName(proxy))
+
+		c.String(http.StatusOK, "%s", header+"\nProxy:\n"+proxy+proxyGroup+foot)
 	})
 	r.Run(":9001")
 
