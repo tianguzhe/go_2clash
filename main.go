@@ -177,7 +177,7 @@ func setNodes(infos []NodeBean) string {
 
 func setPG(infos []NodeBean) string {
 
-	var allName string
+	var allName = ""
 
 	//ppp := getUrlData("https://raw.githubusercontent.com/bddddd/ConfConvertor/master/Emoji/flag_emoji.json")
 
@@ -207,7 +207,7 @@ func setPG(infos []NodeBean) string {
 			continue
 		}
 
-		if i == 0 {
+		if allName == "" {
 			allName = fmt.Sprintf("\"%s\"", strings.ReplaceAll(name, "\r", ""))
 		} else {
 			allName = fmt.Sprintf("%s, \"%s\"", allName, strings.ReplaceAll(name, "\r", ""))
