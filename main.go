@@ -121,13 +121,17 @@ func setNodes(infos []NodeBean) string {
 	for _, node := range infos {
 		name := strings.ReplaceAll(node.Name, "\r", "")
 
-		for k, v := range m {
-			for _, subV := range v {
-				if strings.Contains(name, subV) {
-					name = k + name
-					break
+		if !strings.Contains(name, "官网") {
+			for k, v := range m {
+				for _, subV := range v {
+					if strings.Contains(name, subV) {
+						name = k + name
+						break
+					}
 				}
 			}
+		} else {
+			continue
 		}
 
 		nodeType := node.NodeType
@@ -190,13 +194,17 @@ func setPG(infos []NodeBean) string {
 
 		name := infos[i].Name
 
-		for k, v := range m {
-			for _, subV := range v {
-				if strings.Contains(name, subV) {
-					name = k + name
-					break
+		if !strings.Contains(name, "官网") {
+			for k, v := range m {
+				for _, subV := range v {
+					if strings.Contains(name, subV) {
+						name = k + name
+						break
+					}
 				}
 			}
+		} else {
+			continue
 		}
 
 		if i == 0 {
