@@ -238,7 +238,10 @@ func setPG(infos []NodeBean) string {
 
 		name := infos[i].Name
 
-		if !strings.Contains(name, "官网") {
+		if !strings.Contains(name, "官网") &&
+			!strings.Contains(name, "IPV6") &&
+			!strings.Contains(name, "ipv6") &&
+			!strings.Contains(name, "Ipv6") {
 			for k, v := range m {
 				for _, subV := range v {
 					if strings.Contains(name, subV) {
