@@ -200,7 +200,7 @@ func setNodes(infos []NodeBean) string {
 				}
 			} else {
 				if host == "" {
-					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\" }", name, nodeType, server, port, uuid, alterId, network, path)
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto }", name, nodeType, server, port, uuid, alterId)
 				} else {
 					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, path, host)
 				}
