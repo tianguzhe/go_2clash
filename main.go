@@ -209,7 +209,7 @@ func setNodes(infos []NodeBean) string {
 		} else if nodeType == "ss" {
 			proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, cipher: %s, password: %s }", name, nodeType, server, port, cipher, password)
 		} else if nodeType == "ssr" {
-			proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, cipher: %s, password: %s, protocol: %s, protocolparam: %s, obfs: %s, obfsparam: %s }", name, nodeType, server, port, cipher, password, node.Protocol, node.Protocolparam, node.Obfs, node.Obfsparam)
+			proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, cipher: %s, password: %s, protocol: \"%s\", protocolparam: \"%s\", obfs: \"%s\", obfsparam: \"%s\" }", name, nodeType, server, port, cipher, password, node.Protocol, node.Protocolparam, node.Obfs, node.Obfsparam)
 		}
 
 		proxies = append(proxies, proxy)
