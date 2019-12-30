@@ -161,9 +161,9 @@ func setNodes(infos []NodeBean) string {
 	for _, node := range infos {
 		name := strings.ReplaceAll(node.Name, "\r", "")
 
-		if !strings.Contains(name, "官网") ||
-			!strings.Contains(name, "IPV6") ||
-			!strings.Contains(name, "ipv6") ||
+		if !strings.Contains(name, "官网") &&
+			!strings.Contains(name, "IPV6") &&
+			!strings.Contains(name, "ipv6") &&
 			!strings.Contains(name, "Ipv6") {
 			for k, v := range m {
 				for _, subV := range v {
