@@ -11,10 +11,14 @@ type NodeBean struct {
 	Name     string      `json:"ps"`
 	Tls      string      `json:"tls"`
 	//V        int    `json:"v"`
-	AlterId  interface{} `json:"aid"`
-	Type     string      `json:"type"`
-	Cipher   string      `json:"cipher"`
-	Password string      `json:"password"`
+	AlterId       interface{} `json:"aid"`
+	Type          string      `json:"type"`
+	Cipher        string      `json:"cipher"`
+	Password      string      `json:"password"`
+	Protocol      string
+	Protocolparam string
+	Obfs          string
+	Obfsparam     string
 }
 
 type NodeOrm struct {

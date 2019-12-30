@@ -37,6 +37,9 @@ func getAllNodes(nodes string) []NodeBean {
 		} else if i[0] == "ss:" {
 			ppp := getSSNode(i[1])
 			addNodes = append(addNodes, ppp)
+		} else if i[0] == "ssr:" {
+			ppp := getSSRNode(i[1])
+			addNodes = append(addNodes, ppp)
 		}
 
 	}
@@ -82,6 +85,43 @@ func getSSNode(s string) NodeBean {
 
 }
 
+func getSSRNode(s string) NodeBean {
+	info, err := b64.URLEncoding.DecodeString(DecodeInfoByByte(s))
+	if err != nil {
+		panic(err)
+	}
+
+	var nodeBean NodeBean
+
+	s1, _ := b64.URLEncoding.DecodeString(DecodeInfoByByte(strings.Split(strings.Split(strings.Split(string(info), "?")[1], "&")[0], "=")[1]))
+
+	s2, _ := b64.URLEncoding.DecodeString(DecodeInfoByByte(strings.Split(strings.Split(string(info), "&")[1], "=")[1]))
+
+	s3, _ := b64.URLEncoding.DecodeString(DecodeInfoByByte(strings.Split(strings.Split(string(info), "&")[2], "=")[1]))
+
+	split := strings.Split(string(info), ":")
+
+	nodeBean.Name = string(s3)
+	nodeBean.NodeType = "ssr"
+	nodeBean.Server = split[0]
+	nodeBean.Port = split[1]
+	nodeBean.Protocol = split[2]
+	nodeBean.Protocolparam = string(s2)
+	nodeBean.Cipher = split[3]
+	nodeBean.Obfs = split[4]
+	nodeBean.Obfsparam = string(s1)
+
+	tmp := strings.ReplaceAll(strings.Split(split[5], "?")[0], "/", "")
+
+	pwd, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(tmp))
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+	nodeBean.Password = string(pwd)
+
+	return nodeBean
+}
+
 func getVmessNode(s string) NodeBean {
 
 	decodeString, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(s))
@@ -121,7 +161,10 @@ func setNodes(infos []NodeBean) string {
 	for _, node := range infos {
 		name := strings.ReplaceAll(node.Name, "\r", "")
 
-		if !strings.Contains(name, "官网") {
+		if !strings.Contains(name, "官网") ||
+			!strings.Contains(name, "IPV6") ||
+			!strings.Contains(name, "ipv6") ||
+			!strings.Contains(name, "Ipv6") {
 			for k, v := range m {
 				for _, subV := range v {
 					if strings.Contains(name, subV) {
@@ -160,12 +203,13 @@ func setNodes(infos []NodeBean) string {
 					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\" }", name, nodeType, server, port, uuid, alterId, network, path)
 				} else {
 					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, path, host)
-
 				}
 			}
 
 		} else if nodeType == "ss" {
-			proxy = fmt.Sprintf("- { name: %s, type: %s, server: %s, port: %v, cipher: %s, password: %s }", name, nodeType, server, port, cipher, password)
+			proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, cipher: %s, password: %s }", name, nodeType, server, port, cipher, password)
+		} else if nodeType == "ssr" {
+			proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, cipher: %s, password: %s, protocol: %s, protocolparam: %s, obfs: %s, obfsparam: %s }", name, nodeType, server, port, cipher, password, node.Protocol, node.Protocolparam, node.Obfs, node.Obfsparam)
 		}
 
 		proxies = append(proxies, proxy)

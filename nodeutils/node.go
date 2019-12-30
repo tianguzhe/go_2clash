@@ -10,12 +10,24 @@ import (
 
 //获取订阅链接文本
 func GetUrlData(url string) string {
-	resp, err := http.Get(url)
+	//resp, err := http.Get(url)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer resp.Body.Close()
+	//
+	//s, err := ioutil.ReadAll(resp.Body)
+	//return string(s)
+
+	client := &http.Client{}
+	reqest, _ := http.NewRequest("GET", url, nil)
+	reqest.Header.Add("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1")
+
+	resp, err := client.Do(reqest) //提交
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
-
 	s, err := ioutil.ReadAll(resp.Body)
 	return string(s)
 }
