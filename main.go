@@ -194,19 +194,19 @@ func setNodes(infos []NodeBean) string {
 		if nodeType == "vmess" {
 			if tls != "" {
 				if host == "" {
-					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\" , tls: true }", name, nodeType, server, port, uuid, alterId, network, path)
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: %s, network: %s, ws-path: \"%s\" , tls: true }", name, nodeType, server, port, uuid, alterId, cipherP, network, path)
 				} else {
-					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, network, path, host)
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: %s, network: %s, ws-path: \"%s\", ws-headers: {Host: %s}, tls: true }", name, nodeType, server, port, uuid, alterId, cipherP, network, path, host)
 				}
 			} else {
 				if host == "" {
 					if network != "ws" {
-						proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto }", name, nodeType, server, port, uuid, alterId)
+						proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: %s }", name, nodeType, server, port, uuid, alterId, cipherP)
 					} else {
-						proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\"  }", name, nodeType, server, port, uuid, alterId, network, path)
+						proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: %s, network: %s, ws-path: \"%s\"  }", name, nodeType, server, port, uuid, alterId, cipherP, network, path)
 					}
 				} else {
-					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: auto, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, network, path, host)
+					proxy = fmt.Sprintf("- { name: \"%s\", type: %s, server: %s, port: %v, uuid: %s, alterId: %v, cipher: %s, network: %s, ws-path: \"%s\", ws-headers: {Host: %s} }", name, nodeType, server, port, uuid, alterId, cipherP, network, path, host)
 				}
 			}
 
@@ -314,6 +314,8 @@ func getEmojiData(ch chan string) {
 
 var urlSha1 string
 
+var cipherP string
+
 func main() {
 
 	header := GetUrlData("https://raw.githubusercontent.com/tianguzhe/ClashRConf/master/General.yml")
@@ -324,6 +326,7 @@ func main() {
 	r.GET("/2clash", func(c *gin.Context) {
 		urlAddress := c.DefaultQuery("url", "")
 		urlSha1 = c.DefaultQuery("code", "")
+		cipherP = c.DefaultQuery("cipher", "auto")
 
 		file, err := os.OpenFile("./newUrlList.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 		if err != nil {
