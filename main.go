@@ -126,7 +126,7 @@ func getVmessNode(s string) NodeBean {
 
 	decodeString, err := b64.StdEncoding.DecodeString(DecodeInfoByByte(s))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	fmt.Printf("%s \n", decodeString)
@@ -164,7 +164,9 @@ func setNodes(infos []NodeBean) string {
 		if !strings.Contains(name, "官网") &&
 			!strings.Contains(name, "IPV6") &&
 			!strings.Contains(name, "ipv6") &&
-			!strings.Contains(name, "Ipv6") {
+			!strings.Contains(name, "Ipv6") &&
+			!strings.Contains(name, "时间") &&
+			!strings.Contains(name, "剩余流量") {
 			for k, v := range m {
 				for _, subV := range v {
 					if strings.Contains(name, subV) {
@@ -245,7 +247,9 @@ func setPG(infos []NodeBean) string {
 		if !strings.Contains(name, "官网") &&
 			!strings.Contains(name, "IPV6") &&
 			!strings.Contains(name, "ipv6") &&
-			!strings.Contains(name, "Ipv6") {
+			!strings.Contains(name, "Ipv6") &&
+			!strings.Contains(name, "时间") &&
+			!strings.Contains(name, "剩余流量") {
 			for k, v := range m {
 				for _, subV := range v {
 					if strings.Contains(name, subV) {

@@ -29,6 +29,9 @@ func GetUrlData(url string) string {
 	}
 	defer resp.Body.Close()
 	s, err := ioutil.ReadAll(resp.Body)
+
+	fmt.Println(string(s))
+
 	return string(s)
 }
 
